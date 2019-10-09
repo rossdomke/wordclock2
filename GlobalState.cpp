@@ -76,3 +76,28 @@ uint16_t GlobalState::XY(uint8_t x, uint8_t y){
   
   return i;
 }
+
+void GlobalState::SetButtonStatus(uint8_t button, bool on){
+  uint8_t btnMap = B1 << (button - 1);
+  if(on){
+    ButtonStatus = ButtonStatus | btnMap;
+  }else{
+    btnMap = 255 ^ btnMap;
+    ButtonStatus = ButtonStatus & btnMap;
+  }
+  Serial.print("Btn Map: ");
+  Serial.println(btnMap, BIN); 
+  Serial.print("Button Status: ");
+  Serial.println(ButtonStatus, BIN);
+}
+
+bool GlobalState::GetButtonStatus(uint8_t button){
+  return ((ButtonStatus >> (button - 1))) % 2 > 0;
+}
+
+void GlobalState::ClearButtonStatus(){
+  ButtonStatus = B0;
+}
+bool GlobalState::CheckIfButtonPressed(){
+  return ButtonStatus > 0;
+}

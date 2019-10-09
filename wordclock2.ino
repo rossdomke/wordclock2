@@ -46,29 +46,43 @@ typedef void (*Progs[])(GlobalState&);
 Progs programs = {WordClockProgram, BrightnessProgram};
 
 void loop() {
-  bool runAnimation = false;
+  state.RunAnimation = false;
+  state.ClearButtonStatus();
   if(b1.CheckButton()){
     Serial.println(sizeof(programs));
     currentProgram = (currentProgram + 1) % (sizeof(programs) /2);
     state.Program = programs[currentProgram];
+    state.RunCount = 0;
     Serial.println(currentProgram);
+    state.SetButtonStatus(1, !state.GetButtonStatus(1));
   }
 
   if(b2.CheckButton()){
+    state.SetButtonStatus(2, !state.GetButtonStatus(2));
     state.PrintState();
   }
   if(b3.CheckButton()){
+    state.SetButtonStatus(3, !state.GetButtonStatus(3));
     state.SetBrightness(state.GetBrightness() + 10);
   }
   if(b4.CheckButton()){
     state.SetBrightness(state.GetBrightness() - 10);
+    state.SetButtonStatus(4, !state.GetButtonStatus(4));
+  }
+  if(state.CheckIfButtonPressed())
+    state.RunAnimation = true;
+
+  EVERY_N_MILLISECONDS(30){
+    state.RunAnimation = true;
+  }
+  
+  EVERY_N_MILLISECONDS(50){
+    state.Frame += 1;
   }
 
-  EVERY_N_MILLISECONDS(250){
-    runAnimation = true;
-  }
-  if(runAnimation){
+  if(state.RunAnimation){
     state.Program(state);
+    
 
     for(int x = 0; x < kMatrixWidth; x++){
       for(int y = 0; y < kMatrixHeight; y++){
@@ -78,10 +92,8 @@ void loop() {
     RunMask();
     FastLED.setBrightness(state.GetBrightness());
     FastLED.show();
+    state.RunCount++;
 
-  }
-  EVERY_N_MILLISECONDS(3000){
-    
   }
 }
 

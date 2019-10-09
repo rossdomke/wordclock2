@@ -13,7 +13,9 @@ class GlobalState
     uint8_t Width;
     uint8_t Height;
     bool Serpentine; 
-
+    bool RunAnimation;
+    long RunCount; 
+    
     //functions
     uint8_t NumOfLeds();
     void ReadFromEEPROM();
@@ -22,7 +24,12 @@ class GlobalState
     void SetBrightness(uint8_t);
     uint8_t GetBrightness();
     uint16_t XY(uint8_t, uint8_t);
+    void SetButtonStatus(uint8_t, bool);
+    bool GetButtonStatus(uint8_t);
+    void ClearButtonStatus();
+    bool CheckIfButtonPressed();
   private: 
+    uint8_t ButtonStatus;
     uint8_t Brightness;
 };
 #endif
