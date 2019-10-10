@@ -39,6 +39,18 @@ void GlobalState::PrintState(){
   Serial.println(Brightness);
   Serial.println("Mask: ");
   
+  Serial.print(Time.year(), DEC);
+  Serial.print('/');
+  Serial.print(Time.month(), DEC);
+  Serial.print('/');
+  Serial.print(Time.day(), DEC);
+  Serial.print(' ');
+  Serial.print(Time.hour(), DEC);
+  Serial.print(':');
+  Serial.print(Time.minute(), DEC);
+  Serial.print(':');
+  Serial.print(Time.second(), DEC);
+  Serial.println();
   Serial.println("#-----------#");
   for(uint8_t x = 0; x < Width; x++){
     Serial.print("#");

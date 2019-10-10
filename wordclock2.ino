@@ -4,7 +4,11 @@
 
 FASTLED_USING_NAMESPACE
 
+#include <DS3231.h>
 #include <btn.h>
+
+//DS3231  rtc(SDA, SCL);
+RTClib  rtc;
 
 btn b1 = btn(10, btn::HoldType::ONE_CLICK);
 btn b2 = btn(9, btn::HoldType::ONE_CLICK);
@@ -31,7 +35,7 @@ GlobalState state = GlobalState(kMatrixWidth, kMatrixHeight, mask);
 void setup() {
 
  delay(1000);
-
+  Wire.begin();
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   //Set Default Program
   state.Program = WordClockProgram;
@@ -49,25 +53,22 @@ void loop() {
   state.RunAnimation = false;
   state.ClearButtonStatus();
   if(b1.CheckButton()){
-    Serial.println(sizeof(programs));
     currentProgram = (currentProgram + 1) % (sizeof(programs) /2);
     state.Program = programs[currentProgram];
     state.RunCount = 0;
-    Serial.println(currentProgram);
     state.SetButtonStatus(1, !state.GetButtonStatus(1));
   }
 
   if(b2.CheckButton()){
-    state.SetButtonStatus(2, !state.GetButtonStatus(2));
+    state.SetButtonStatus(2, true);
     state.PrintState();
   }
   if(b3.CheckButton()){
-    state.SetButtonStatus(3, !state.GetButtonStatus(3));
-    state.SetBrightness(state.GetBrightness() + 10);
+    state.SetButtonStatus(3, true);
   }
   if(b4.CheckButton()){
-    state.SetBrightness(state.GetBrightness() - 10);
-    state.SetButtonStatus(4, !state.GetButtonStatus(4));
+    
+    state.SetButtonStatus(4, true);
   }
   if(state.CheckIfButtonPressed())
     state.RunAnimation = true;
@@ -79,7 +80,10 @@ void loop() {
   EVERY_N_MILLISECONDS(50){
     state.Frame += 1;
   }
-
+  EVERY_N_SECONDS(1){
+    state.Time = rtc.now();
+  }
+ 
   if(state.RunAnimation){
     state.Program(state);
     

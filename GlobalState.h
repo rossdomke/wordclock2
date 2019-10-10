@@ -2,6 +2,7 @@
 #define GlobalState_h
 #include "Arduino.h"
 #include "FastLED.h"
+#include <DS3231.h>
 class GlobalState
 {
   public: 
@@ -15,7 +16,7 @@ class GlobalState
     bool Serpentine; 
     bool RunAnimation;
     long RunCount; 
-    
+    DateTime Time;
     //functions
     uint8_t NumOfLeds();
     void ReadFromEEPROM();
