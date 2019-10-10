@@ -18,6 +18,8 @@ class GlobalState
     long RunCount; 
     DateTime Time;
     //functions
+    void SetMaskRange(uint8_t, uint8_t, uint8_t, bool);
+    void SetMaskRange(uint8_t, uint8_t, uint8_t, uint8_t, bool);
     uint8_t NumOfLeds();
     void ReadFromEEPROM();
     void WriteToEEPROM();

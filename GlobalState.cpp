@@ -113,3 +113,16 @@ void GlobalState::ClearButtonStatus(){
 bool GlobalState::CheckIfButtonPressed(){
   return ButtonStatus > 0;
 }
+
+
+
+void GlobalState::SetMaskRange(uint8_t y,uint8_t x1,uint8_t x2, bool On){
+  SetMaskRange(x1, y, x2, y, On);
+}
+void GlobalState::SetMaskRange(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, bool On){
+  for(uint8_t o = x1; o <= x2; o++){
+    for(uint8_t i = y1; i <= y2; i++){
+      Mask[XY(o, i)] = On;
+    }
+  }
+}
