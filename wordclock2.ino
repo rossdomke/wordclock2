@@ -1,14 +1,15 @@
 #include "FastLED.h"
 #include "GlobalState.h"
 #include "EEPROM.h"
+#include "ColorPallettes.h"
+#include "ColorAnimations.h"
 
 FASTLED_USING_NAMESPACE
 
 #include <DS3231.h>
 #include <btn.h>
 
-//DS3231  rtc(SDA, SCL);
-RTClib  rtc;
+DS3231  rtc;
 
 btn b1 = btn(10, btn::HoldType::ONE_CLICK);
 btn b2 = btn(9, btn::HoldType::ONE_CLICK);
@@ -27,7 +28,7 @@ const uint16_t NUM_LEDS = kMatrixWidth * kMatrixHeight;
 CRGB leds[NUM_LEDS];
 #define FRAMES_PER_SECOND 120;
 bool mask[NUM_LEDS];
-GlobalState state = GlobalState(kMatrixWidth, kMatrixHeight, mask);
+GlobalState state = GlobalState(kMatrixWidth, kMatrixHeight, mask, &rtc);
 
 
 
@@ -47,8 +48,7 @@ uint8_t hue = 0;
 
 uint8_t currentProgram = 0;
 typedef void (*Progs[])(GlobalState&);
-Progs programs = {WordClockProgram, BrightnessProgram};
-
+Progs programs = {WordClockProgram, BrightnessProgram, ColorPaletteProgram, RandomMaskProgram};
 void loop() {
   state.RunAnimation = false;
   state.ClearButtonStatus();
@@ -78,10 +78,14 @@ void loop() {
   }
   
   EVERY_N_MILLISECONDS(50){
-    state.Frame += 1;
+    state.Frame += state.GetSpeed();
   }
   EVERY_N_SECONDS(1){
-    state.Time = rtc.now();
+    state.UpdateTime();
+    state.RunAnimation = true;
+  }
+  EVERY_N_MINUTES(1){
+    //state.CurrentPaletteIndex = GetRandomPaletteIndex();
   }
  
   if(state.RunAnimation){
@@ -90,7 +94,8 @@ void loop() {
 
     for(int x = 0; x < kMatrixWidth; x++){
       for(int y = 0; y < kMatrixHeight; y++){
-        leds[state.XY(x,y)].setHue(state.Frame + x * 3);
+        // leds[state.XY(x,y)].setHue(state.Frame + x * 3);
+        leds[state.XY(x,y)] =  animations[state.GetAnimationIndex()](state, x, y);//
       }
     }
     RunMask();
